@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------- User Model ---------------------------------
+
+model User {
+  id                  String         @id @default(uuid())
+  firstName           String
+  lastName            String
+  email               String         @unique
+  password            String
+  profilePhoto        String?
+  budgets             Budget[]
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  adminBudgets        BudgetAdmin[]
+  memberBudgets       BudgetMember[]
+  handledTransactions Transaction[]  @relation("handledTransactions")
+  transactions        Transaction[]  @relation("transactions")
+  markedDeleted       Boolean        @default(false)
+}
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- Budget -------------------------------------
+
+model Budget {
+  id           String         @id @default(uuid())
+  title        String
+  amount       Float
+  description  String
+  isFrozen     Boolean        @default(false)
+  currencyId   Int
+  currency     Currency       @relation(fields: [currencyId], references: [id])
+  ownerId      String
+  owner        User           @relation(fields: [ownerId], references: [id])
+  admins       BudgetAdmin[]
+  members      BudgetMember[]
+  transactions Transaction[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  endAt        DateTime
+}
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- BudgetAdmin --------------------------------
+
+model BudgetAdmin {
+  budgetId String
+  budget   Budget @relation(fields: [budgetId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@id([budgetId, userId])
+}
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- Budget Member --------------------------------
+
+model BudgetMember {
+  budgetId String
+  budget   Budget @relation(fields: [budgetId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@id([budgetId, userId])
+}
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- Transaction --------------------------------
+
+model Transaction {
+  id            String            @id @default(uuid())
+  transactionId String
+  purpose       String
+  amount        Float
+  status        TransactionStatus @default(PENDING)
+  handlerId     String?
+  handler       User?             @relation("handledTransactions", fields: [handlerId], references: [id])
+  creatorId     String
+  creator       User              @relation("transactions", fields: [creatorId], references: [id])
+  budgetId      String
+  budget        Budget            @relation(fields: [budgetId], references: [id])
+  reciept       Reciept?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- File ---------------------------------------
+
+model File {
+  id            String   @id @default(uuid())
+  name          String
+  url           String
+  reciept       Reciept?
+  markedDeleted Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- Reciepts -----------------------------------
+
+model Reciept {
+  id            String      @id @default(uuid())
+  fileId        String      @unique
+  file          File        @relation(fields: [fileId], references: [id])
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- Currency -----------------------------------
+
+model Currency {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String
+  symbol    String
+  budgets   Budget[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Sample
+// {
+//   "name": "Nigerian Naira",
+//   "code": "NGN",
+//   "symbol": "₦"
+// }
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- Enums --------------------------------------
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  VALIDATED
+}
