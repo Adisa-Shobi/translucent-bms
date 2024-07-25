@@ -518,7 +518,7 @@ export class BudgetService {
 
     if (filters_or.length === 0 && filters_and.length === 0) return [];
 
-    return this.databaseService.budget.findMany({
+    const budgets = await this.databaseService.budget.findMany({
       where: {
         OR: filters_or,
         ...filters_and,
@@ -526,9 +526,36 @@ export class BudgetService {
       include: {
         admins: true,
         members: true,
+        transactions: {
+          where: {
+            OR: [
+              {
+                status: "APPROVED",
+              },
+              {
+                status: "VALIDATED",
+              },
+            ],
+          },
+          select: {
+            amount: true,
+          },
+        },
       },
       skip: pagination?.skip,
       take: pagination?.limit,
+    });
+
+    return budgets.map((budget) => {
+      const expenses = budget.transactions.reduce(
+        (acc, transaction) => acc + transaction.amount,
+        0,
+      );
+      const { transactions, ...budgetData } = budget;
+      return {
+        ...budgetData,
+        expenses,
+      };
     });
   }
 
