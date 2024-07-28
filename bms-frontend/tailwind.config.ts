@@ -1,13 +1,13 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
 const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-	],
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -18,23 +18,49 @@ const config = {
       },
     },
     extend: {
+      transitionProperty: {
+        "transform": "transform",
+      },
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
+        border: { DEFAULT: "#A39F9F", dark: "#FFFFFF" },
+        input: { DEFAULT: "#A39F9F", dark: "#FFFFFF" },
+
+        // input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // primary: {
+        //   DEFAULT: "hsl(var(--primary))",
+        //   foreground: "hsl(var(--primary-foreground))",
+        // },
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#3A5AFE",
+          tint: "#ECEFFC",
         },
+        warning: {
+          DEFAULT: "#F59E0B",
+          tint: "#FEF3C7",
+        },
+
+        // secondary: {
+        //   DEFAULT: "hsl(var(--secondary))",
+        //   foreground: "hsl(var(--secondary-foreground))",
+        // },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#7B7575",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+        },
+        reject: {
+          DEFAULT: "#DC2626",
+          tint: "#FEE2E2",
+        },
+        success: {
+          DEFAULT: "#16A34A",
+          tint: "#DCFCE7",
+          foreground: "#FFFFFF",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -75,6 +101,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;

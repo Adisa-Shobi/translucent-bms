@@ -2,6 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+
+  /* Fonts and typeface */
+  .c-cap-subheading {
+    @apply uppercase font-normal text-sm;
+  }
+
+  .c-subheading {
+    @apply font-normal text-sm;
+  }
+
+  .c-subtitle {
+    @apply font-normal text-xs text-secondary;
+  }
+
+  .c-heading-1 {
+    @apply font-bold text-5xl;
+  }
+
+  .c-heading-2 {
+    @apply font-bold text-4xl;
+  }
+
+  .c-heading-3 {
+    @apply font-bold text-3xl;
+  }
+
+  .c-heading-4 {
+    @apply font-bold text-2xl;
+  }
+
+  .c-heading-5 {
+    @apply font-bold text-lg;
+  }
+
+  .c-heading-6 {
+    @apply font-bold text-base;
+  }
+
+  .c-heading-7 {
+    @apply font-bold text-sm;
+  }
+
+  /* Background Styling */
+
+  .c-bg-img {
+    @apply bg-no-repeat bg-right bg-auto;
+  }
+
+  .c-bg-layer {
+    @apply absolute inset-0;
+  }
+
+  /* Buttons */
+
+  .c-primary-btn {
+    @apply text-[Montserrat] gap-4 items-center justify-center bg-primary text-white rounded-lg;
+  }
+
+  .c-primary-btn-wide {
+    @apply text-[Montserrat] w-full bg-primary text-white p-3 rounded-lg mt-6;
+  }
+
+  /* Inputs */
+
+  .c-input-label {
+    @apply font-[Montserrat] font-bold text-sm;
+  }
+
+  .c-input-error {
+    @apply !font-[Montserrat] !font-normal !text-xs !text-red-500;
+  }
+
+  .c-input-text {
+    @apply !font-[Montserrat];
+  }
+
+  .c-field-border {
+    @apply focus-visible:!ring-primary focus-visible:!outline-none;
+  }
+
+  .c-no-ring {
+    @apply focus-visible:!ring-offset-0 focus-visible:!ring-0
+  }
+
+  .c-input-field {
+    @apply !h-12 border-none focus-visible:!ring-primary focus-visible:!outline-none !w-full focus-visible:!ring-offset-0 focus-visible:border-none;
+  }
+  
+  .c-input-field-focus {
+    @apply !h-12 border-none focus-within:!border-primary  focus-within:border-2 outline-none !w-full focus-visible:!ring-offset-0 focus-visible:border-none rounded-lg;
+  }
+  
+  .c-input-field-error-focus {
+    @apply !h-12 border-none focus-within:!border-destructive  focus-within:border-2 outline-none !w-full focus-visible:!ring-offset-0 focus-visible:border-none rounded-lg;
+  }
+
+  .c-input-field-error {
+    @apply !h-12 border-none focus-visible:!ring-destructive focus-visible:!outline-none !w-full focus-visible:!ring-offset-0 focus-visible:border-none;
+  }
+
+  /* Spinner */
+
+  .c-spinner {
+    @apply mr-2 h-4 w-4 animate-spin
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -59,11 +167,22 @@
   }
 }
 
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../assets//fonts//Montserrat/Montserrat-VariableFont_wght.ttf');
+}
+
+@font-face {
+  font-family: 'Montserrat-Italic';
+  src: url('../../assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf');
+}
+
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground !font-[Montserrat];
   }
 }
