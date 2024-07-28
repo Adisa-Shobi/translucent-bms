@@ -12,7 +12,7 @@ export default function page() {
                 <div className='max-w-[400px] w-full' >
                     <div className='flex flex-col gap-2 mb-8' >
                         <h1 className='c-heading-2' >Welcome Back</h1>
-                        <p className='c-subheading' >Don't have an account? <a href="/register" className='text-primary' >Sign Up</a> </p>
+                        <p className='c-subheading' >Don&apos;t have an account? <a href="/register" className='text-primary' >Sign Up</a> </p>
                     </div>
                     <LoginForm />
                 </div>

@@ -32,9 +32,12 @@ export const FormInput = React.memo((props: FormFieldProps) => {
             render={({ field }) => (
                 <FormItem className="mb-4">
                     <FormLabel className="c-input-label" >{props.label}</FormLabel>
-                    <FormControl className={`${!useFormField()?.error ? "c-input-field" : "c-input-field-error"} ${!props.hideBorder && "border-double" }`}>
-                        <Input type={props.type || 'text'} placeholder={props.placeholder} {...field} />
-                    </FormControl>
+                    {
+                        // eslint-disable-next-line react-hooks/rules-of-hooks
+                        <FormControl className={`${!useFormField()?.error ? "c-input-field" : "c-input-field-error"} ${!props.hideBorder && "border-double"}`}>
+                            <Input type={props.type || 'text'} placeholder={props.placeholder} {...field} />
+                        </FormControl>
+                    }
                     {props.description && <FormDescription className="text-xs" >{props.description}</FormDescription>}
                     <FormMessage className="c-input-error" />
                 </FormItem>

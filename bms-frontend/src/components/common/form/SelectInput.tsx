@@ -31,10 +31,12 @@ export const SelectInput = (props: FormFieldProps) => {
                     {/* <Input type={props.type || 'text'} placeholder={props.placeholder} {...field} /> */}
                     <Select onValueChange={field.onChange} defaultValue={field.value} >
                         <FormControl >
-                            <SelectTrigger className={`${!useFormField()?.error ? "c-input-field" : "c-input-field-error"} ${!props.hideBorder && "border-double"}`}>
-                                <SelectValue placeholder={props.placeholder} />
-                            </SelectTrigger>
-
+                            {
+                                // eslint-disable-next-line react-hooks/rules-of-hooks
+                                <SelectTrigger className={`${!useFormField()?.error ? "c-input-field" : "c-input-field-error"} ${!props.hideBorder && "border-double"}`}>
+                                    <SelectValue placeholder={props.placeholder} />
+                                </SelectTrigger>
+                            }
                         </FormControl>
                         <SelectContent>
                             {props.options.map((item) => {

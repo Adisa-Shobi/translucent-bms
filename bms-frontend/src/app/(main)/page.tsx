@@ -61,7 +61,7 @@ function Home() {
         {
           filterBudgets.map((bgt, index) => {
             return (
-              <BudgetCard budget={bgt} />
+              <BudgetCard key={index} budget={bgt} />
             )
           })
         }

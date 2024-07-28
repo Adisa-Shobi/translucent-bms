@@ -57,7 +57,7 @@ export const TotalExpense = () => {
                 {
                     totalExpenses?.transactions.map((transaction, index) => {
                         return (
-                            <TransactionItem transaction={transaction} />
+                            <TransactionItem key={index} transaction={transaction} />
                         )
                     })
                 }

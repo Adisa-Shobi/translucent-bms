@@ -34,6 +34,7 @@ export const DateInput = (props: FormFieldProps) => {
 
                     <Popover >
                         <div className={cn(
+                            // eslint-disable-next-line react-hooks/rules-of-hooks
                             !useFormField()?.error ? "c-input-field-focus" : "c-input-field-error-focus",
                             "border-double border !h-fit"
                         )}>

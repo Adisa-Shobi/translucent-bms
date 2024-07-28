@@ -3,7 +3,7 @@ import bg from '../../../public/signup-img.svg'
 import SignUpForm from './components/SignUpForm'
 
 
-export default function () {
+export default function Page() {
     return (
         <div className='flex w-full h-screen overflow-scroll'  >
             <div className='c-bg-layer c-bg-img' style={{

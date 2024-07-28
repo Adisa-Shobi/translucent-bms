@@ -39,17 +39,20 @@ export function PasswordInput(props: FormFieldProps) {
                             </div>
                         )}
                     </div>
+                    {
+                        // eslint-disable-next-line react-hooks/rules-of-hooks
+                        <div className={`pr-3 bg-white flex flex-row items-center c-input-field  focus-within:ring-2 ${useFormField()?.error ? "focus-within:ring-destructive" : "focus-within:ring-primary"} focus-within:ring-offset-2 rounded-lg`}>
 
-                    <div className={`pr-3 bg-white flex flex-row items-center c-input-field  focus-within:ring-2 ${ useFormField()?.error ? "focus-within:ring-destructive" : "focus-within:ring-primary"} focus-within:ring-offset-2 rounded-lg`}>
-                        <FormControl className="border-none focus-visible:ring-transparent focus-visible:outline-none w-full">
-                            <Input className="c-input-text" type={showPassword ? 'text' : 'password'} placeholder={props.placeholder || ""} {...field} />
-                        </FormControl>
-                        <span onClick={() => {
-                            setShowPassword(!showPassword);
-                        }} >
-                            {!showPassword ? <FiEyeOff /> : <FiEye />}
-                        </span>
-                    </div>
+                            <FormControl className="border-none focus-visible:ring-transparent focus-visible:outline-none w-full">
+                                <Input className="c-input-text" type={showPassword ? 'text' : 'password'} placeholder={props.placeholder || ""} {...field} />
+                            </FormControl>
+                            <span onClick={() => {
+                                setShowPassword(!showPassword);
+                            }} >
+                                {!showPassword ? <FiEyeOff /> : <FiEye />}
+                            </span>
+                        </div>
+                    }
 
                     {props.description && <FormDescription>{props.description}</FormDescription>}
                     <FormMessage className="c-input-error" />

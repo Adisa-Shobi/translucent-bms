@@ -1,13 +1,13 @@
 "use client";
-import React, { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { TransactionDetailCard } from './components/TransactionDetailCard'
 import { useParams } from 'next/navigation'
 import { fetchTransaction } from '@/lib/api/transaction/transaction'
 import { TransactionButtons } from './components/TransactionButtons';
 
-export default function page() {
-    const [transaction, setTransaction] = React.useState<any>(null)
-    const [loading, setLoading] = React.useState(false)
+export default function Page() {
+    const [transaction, setTransaction] = useState<any>(null)
+    const [loading, setLoading] = useState(false)
     const { transactionId } = useParams()
 
     const loadTransaction = (id: string) => {
