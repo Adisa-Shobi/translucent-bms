@@ -14,7 +14,7 @@ export const StatusBadge = ({ status }: { status: TransactionStatus }) => {
 
     const getStyles = ({ status }: { status: TransactionStatus }) => {
         return cn(
-            "m-2 text-white rounded-lg ml-0 hover:bg-transparent cursor-default",
+            "m-2 text-white rounded-lg ml-0 hover:bg-transparent cursor-default h-fit",
             statusClasses[status] || statusClasses.default
         )
     }

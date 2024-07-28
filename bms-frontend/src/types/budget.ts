@@ -23,3 +23,7 @@ export interface Budget {
   members: Member[];
   expenses: number;
 }
+
+export interface InviteMemberDto {
+  email: string;
+}

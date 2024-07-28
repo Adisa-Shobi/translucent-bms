@@ -1,21 +1,20 @@
 import { freezeBudget, unfreezeBudget } from "@/lib/api/budget/budget";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 export const FreezeBudget = () => {
-    const params = useSearchParams();
-    const budget_id = params.get('budget_id');
+    const {budget} = useParams();
     const [loading, setLoading] = useState(false);
     const [checked, setChecked] = useState(false);
-    const showFreeze = budget_id ? true : false;
+    const showFreeze = budget ? true : false;
 
     const handleChange = (e: any) => {
         if (!checked) {
-            handleFreeze(budget_id);
+            handleFreeze(budget as string);
         } else {
-            handleUnfreeze(budget_id);
+            handleUnfreeze(budget as string);
         }
         setChecked(!checked);
     };

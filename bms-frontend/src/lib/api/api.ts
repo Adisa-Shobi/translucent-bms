@@ -2,7 +2,6 @@
 import { toast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { getSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 import { signOut } from "next-auth/react";
 
 const buildHeadersWithAuth = async () => {

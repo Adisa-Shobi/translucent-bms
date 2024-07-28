@@ -5,6 +5,8 @@ export const budgetEndpoints = {
   getUserBudgets: (id: string) => `/user/${id}/budgets`,
   getUserExpenditure: (id: string) => `/budget/${id}/user-expenditure`,
   getTransactions: (id: string) => `/budget/${id}/transaction`,
+  createTransaction: (id: string) => `/budget/${id}/transaction`,
+  addMember: (id: string) => `/budget/${id}/member`,
   budget: {
     summary: {
       get: (id: string) => `/budget/${id}/summary`,

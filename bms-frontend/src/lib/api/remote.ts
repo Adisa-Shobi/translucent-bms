@@ -17,7 +17,7 @@ export const getRequest = async (
 
 export const postRequest = async (
   url: string,
-  data: any,
+  data?: any,
   config: AxiosRequestConfig = {},
 ) => {
   try {

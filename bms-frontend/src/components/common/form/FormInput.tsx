@@ -35,7 +35,7 @@ export const FormInput = React.memo((props: FormFieldProps) => {
                     <FormControl className={`${!useFormField()?.error ? "c-input-field" : "c-input-field-error"} ${!props.hideBorder && "border-double" }`}>
                         <Input type={props.type || 'text'} placeholder={props.placeholder} {...field} />
                     </FormControl>
-                    {props.description && <FormDescription>{props.description}</FormDescription>}
+                    {props.description && <FormDescription className="text-xs" >{props.description}</FormDescription>}
                     <FormMessage className="c-input-error" />
                 </FormItem>
             )}

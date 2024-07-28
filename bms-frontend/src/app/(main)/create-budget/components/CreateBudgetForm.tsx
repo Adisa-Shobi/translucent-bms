@@ -52,7 +52,6 @@ export default function CreateBudgetForm() {
         defaultValues: {
             title: "",
             description: "",
-            endAt: new Date(),
         }
     });
 
