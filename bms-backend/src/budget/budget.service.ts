@@ -11,6 +11,7 @@ import moment from "moment";
 import { TransactionService } from "src/transaction/transaction.service";
 import { CurrencyService } from "src/currency/currency.service";
 import { emit } from "process";
+import { convertBigIntToString } from "src/utils/helpers";
 
 @Injectable()
 export class BudgetService {
@@ -413,38 +414,66 @@ export class BudgetService {
     const budget = await this.databaseService.budget.findUnique({
       where: { id },
     });
-
-    console.log(budget);
+  
     if (!budget) {
       throw new BadRequestException("Budget not found");
     }
-
-    return this.databaseService.$queryRaw`
-    SELECT 
-      u.id,
-      u."firstName",
-      u."lastName",
-      u.email,
-    COALESCE(SUM(t.amount), 0) AS "totalTransactions"
-    FROM 
-      "User" u
-    LEFT JOIN 
-      "Transaction" t ON u.id = t."creatorId"
-    LEFT JOIN 
-      "BudgetMember" bm ON u.id = bm."userId"
-    LEFT JOIN 
-      "Budget" b ON bm."budgetId" = b.id OR u.id = b."ownerId"
-    WHERE 
-      b.id = ${id} -- Replace 'budget-id' with the actual budget ID
-    GROUP BY 
-      u.id
-    ORDER BY 
-      "totalTransactions" DESC
-    LIMIT 
-      ${pagination.limit} -- Number of records per page
-    OFFSET 
-      ${pagination.skip}; -- Offset for pagination (0 for the first page, 10 for the second page, etc.)
-  `;
+  
+    const result = await this.databaseService.$queryRaw`
+      WITH user_expenditures AS (
+        SELECT 
+          u.id,
+          u."firstName",
+          u."lastName",
+          u.email,
+          COALESCE(SUM(t.amount), 0) AS "totalTransactions"
+        FROM 
+          "User" u
+        LEFT JOIN 
+          "Transaction" t ON u.id = t."creatorId" AND t.status IN ('APPROVED', 'VALIDATED')
+        LEFT JOIN 
+          "BudgetMember" bm ON u.id = bm."userId"
+        LEFT JOIN 
+          "Budget" b ON bm."budgetId" = b.id OR u.id = b."ownerId"
+        WHERE 
+          b.id = ${id}
+        GROUP BY 
+          u.id
+      ),
+      expenditures_with_rank AS (
+        SELECT 
+          *,
+          ROW_NUMBER() OVER (ORDER BY "totalTransactions" DESC) as row_num
+        FROM 
+          user_expenditures
+      ),
+      avg_expenditure AS (
+        SELECT AVG("totalTransactions") AS "avgUserExpenditure"
+        FROM user_expenditures
+      )
+      SELECT 
+        e.*,
+        a."avgUserExpenditure",
+        (SELECT COUNT(*) FROM user_expenditures) AS "totalCount"
+      FROM 
+        expenditures_with_rank e
+      CROSS JOIN 
+        avg_expenditure a
+      WHERE 
+        e.row_num > ${pagination.skip} AND e.row_num <= ${pagination.skip + pagination.limit}
+      ORDER BY 
+        e."totalTransactions" DESC
+    `;
+  
+    const convertedResult = convertBigIntToString(result);
+  
+    const expenditures = convertedResult.map(({ avgUserExpenditure, totalCount, ...rest }) => rest);
+    const aggregates = {
+      avgUserExpenditure: convertedResult[0]?.avgUserExpenditure || "0",
+      totalCount: convertedResult[0]?.totalCount || "0",
+    };
+  
+    return { expenditures, aggregates };
   }
 
   async getBudgetsByUser(
