@@ -414,66 +414,75 @@ export class BudgetService {
     const budget = await this.databaseService.budget.findUnique({
       where: { id },
     });
-  
+
     if (!budget) {
       throw new BadRequestException("Budget not found");
     }
-  
-    const result = await this.databaseService.$queryRaw`
-      WITH user_expenditures AS (
-        SELECT 
-          u.id,
-          u."firstName",
-          u."lastName",
-          u.email,
-          COALESCE(SUM(t.amount), 0) AS "totalTransactions"
-        FROM 
-          "User" u
-        LEFT JOIN 
-          "Transaction" t ON u.id = t."creatorId" AND t.status IN ('APPROVED', 'VALIDATED')
-        LEFT JOIN 
-          "BudgetMember" bm ON u.id = bm."userId"
-        LEFT JOIN 
-          "Budget" b ON bm."budgetId" = b.id OR u.id = b."ownerId"
-        WHERE 
-          b.id = ${id}
-        GROUP BY 
-          u.id
+
+    const expenditures = await this.databaseService.user.findMany({
+      where: {
+        OR: [
+          { memberBudgets: { some: { budgetId: id } } },
+          { budgets: { some: { id } } },
+        ],
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        profilePhoto: true,
+        transactions: {
+          where: {
+            budgetId: id,
+            status: { in: ["APPROVED", "VALIDATED"] },
+          },
+          select: {
+            amount: true,
+          },
+        },
+      },
+      skip: pagination.skip,
+      take: pagination.limit,
+    });
+
+    const processedExpenditures = expenditures.map((user) => ({
+      ...user,
+      totalTransactions: user.transactions.reduce(
+        (sum, t) => sum + t.amount,
+        0,
       ),
-      expenditures_with_rank AS (
-        SELECT 
-          *,
-          ROW_NUMBER() OVER (ORDER BY "totalTransactions" DESC) as row_num
-        FROM 
-          user_expenditures
-      ),
-      avg_expenditure AS (
-        SELECT AVG("totalTransactions") AS "avgUserExpenditure"
-        FROM user_expenditures
-      )
-      SELECT 
-        e.*,
-        a."avgUserExpenditure",
-        (SELECT COUNT(*) FROM user_expenditures) AS "totalCount"
-      FROM 
-        expenditures_with_rank e
-      CROSS JOIN 
-        avg_expenditure a
-      WHERE 
-        e.row_num > ${pagination.skip} AND e.row_num <= ${pagination.skip + pagination.limit}
-      ORDER BY 
-        e."totalTransactions" DESC
-    `;
-  
-    const convertedResult = convertBigIntToString(result);
-  
-    const expenditures = convertedResult.map(({ avgUserExpenditure, totalCount, ...rest }) => rest);
-    const aggregates = {
-      avgUserExpenditure: convertedResult[0]?.avgUserExpenditure || "0",
-      totalCount: convertedResult[0]?.totalCount || "0",
+    }));
+
+    const totalCount = await this.databaseService.user.count({
+      where: {
+        OR: [
+          { memberBudgets: { some: { budgetId: id } } },
+          { budgets: { some: { id } } },
+        ],
+      },
+    });
+
+    const allTransactions = await this.databaseService.transaction.findMany({
+      where: {
+        status: { in: ["APPROVED", "VALIDATED"] },
+        budgetId: id,
+      },
+      select: {
+        amount: true,
+      },
+    });
+
+    const totalAmount = allTransactions.reduce((sum, t) => sum + t.amount, 0);
+    const avgUserExpenditure = totalCount > 0 ? totalAmount / totalCount : 0;
+
+    return {
+      aggregates: {
+        avgUserExpenditure,
+        totalCount,
+      },
+      expenditures: processedExpenditures,
     };
-  
-    return { expenditures, aggregates };
   }
 
   async getBudgetsByUser(
