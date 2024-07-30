@@ -33,6 +33,7 @@ const login = async (credentials: any): Promise<any> => {
   }
 };
 
+// million-ignore
 export const config: NextAuthConfig = {
   pages: { signIn: "/login" },
   providers: [

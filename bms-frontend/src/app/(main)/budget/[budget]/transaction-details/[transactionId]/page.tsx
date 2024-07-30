@@ -4,6 +4,7 @@ import { TransactionDetailCard } from './components/TransactionDetailCard'
 import { useParams } from 'next/navigation'
 import { fetchTransaction } from '@/lib/api/transaction/transaction'
 import { TransactionButtons } from './components/TransactionButtons';
+import { FilePreview } from './components/FilePreview';
 
 export default function Page() {
     const [transaction, setTransaction] = useState<any>(null)
@@ -32,11 +33,12 @@ export default function Page() {
     }
 
     return (
-        <div className='flex' >
+        <div className='flex h-min' >
             <div className='w-1/2'>
                 <TransactionDetailCard transaction={transaction} />
             </div>
-            <div className='w-1/2'>
+            <div className='w-1/2 flex flex-col justify-between h-auto'>
+                <FilePreview url={transaction?.reciept?.file?.url} fileName={transaction?.reciept?.file?.url} />
                 <TransactionButtons loadTransaction={loadTransaction} transaction={transaction} />
             </div>
         </div>

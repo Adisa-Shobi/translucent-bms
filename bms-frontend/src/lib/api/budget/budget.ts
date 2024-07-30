@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { getRequest, postRequest } from "../remote";
+import { deleteRequest, getRequest, postRequest } from "../remote";
 import { CreateBudgetDto } from "./budgetDto";
 import { budgetEndpoints } from "./budgetEndpoints";
 import { InviteMemberDto } from "@/types/budget";
@@ -24,8 +24,8 @@ export const getBudgetSummary = (id: string) => {
   return getRequest(budgetEndpoints.budget.summary.get(id));
 };
 
-export const getUserExpenditure = (id: string) => {
-  return getRequest(budgetEndpoints.getUserExpenditure(id));
+export const getUserExpenditure = (id: string, params: any) => {
+  return getRequest(budgetEndpoints.getUserExpenditure(id), { params });
 };
 
 export const getTransactions = (id: string, params: any) => {
@@ -37,5 +37,25 @@ export const createTransaction = (id: string, data: any) => {
 };
 
 export const addMember = (id: string, data: InviteMemberDto) => {
-  return postRequest(budgetEndpoints.addMember(id), data);
+  return postRequest(budgetEndpoints.member.add(id), data);
+};
+
+export const removeMember = (id: string, data: any) => {
+  return deleteRequest(budgetEndpoints.member.remove(id), { data });
+};
+
+export const getMembers = (id: string) => {
+  return getRequest(budgetEndpoints.member.get(id));
+};
+
+export const addAdmin = (id: string, data: any) => {
+  return postRequest(budgetEndpoints.admin.add(id), data);
+};
+
+export const getAdmins = (id: string) => {
+  return getRequest(budgetEndpoints.admin.get(id));
+};
+
+export const removeAdmin = (id: string, data: any) => {
+  return deleteRequest(budgetEndpoints.admin.remove(id), { data });
 };

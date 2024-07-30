@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { InviteUserForm } from "./InviteUserForm";
 
 
-export const AddMemberButton = () => {
+export const AddMemberButton = ({ onFinish }: { onFinish: () => void }) => {
     return (
         <>
             <Dialog >
@@ -19,7 +19,7 @@ export const AddMemberButton = () => {
                         <DialogDescription className="!mt-4">
                             Send an invite to a new user to join your budget
                         </DialogDescription>
-                        <InviteUserForm />
+                        <InviteUserForm onFinish={onFinish} />
                     </DialogHeader>
                 </DialogContent>
             </Dialog>

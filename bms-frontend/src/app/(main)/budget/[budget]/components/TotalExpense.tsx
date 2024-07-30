@@ -1,7 +1,5 @@
 "use client";
 import { StatusBadge } from "@/components/common";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getTransactions } from "@/lib/api/budget/budget";
 import { toMoney } from "@/lib/utils";
@@ -42,7 +40,7 @@ export const TotalExpense = () => {
     }
 
     return (
-        <div className="border rounded-lg p-4" >
+        <div className="border rounded-lg p-4 h-[400px] overflow-clip" >
             <h3 className="c-subheading text-secondary text-base" >
                 Total Expense
             </h3>
@@ -63,7 +61,7 @@ export const TotalExpense = () => {
                 }
             </div>
             <div className="flex justify-end" >
-                <a href={`${pathname}/transactions`} className=" flex items-center text-sm cursor-pointer pt-3 text-primary underline font-semibold" >
+                <a href={`${pathname}/transactions`} aria-disabled={true} className=" flex items-center text-sm cursor-pointer pt-3 text-primary underline font-semibold" >
                     View Transactions <GoArrowUpRight />
                 </a>
             </div>

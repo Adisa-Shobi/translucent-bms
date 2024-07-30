@@ -21,6 +21,9 @@ const config = {
       transitionProperty: {
         "transform": "transform",
       },
+      height: {
+        "fill-available": "-webkit-fill-available",
+      },
       colors: {
         border: { DEFAULT: "#A39F9F", dark: "#FFFFFF" },
         input: { DEFAULT: "#A39F9F", dark: "#FFFFFF" },

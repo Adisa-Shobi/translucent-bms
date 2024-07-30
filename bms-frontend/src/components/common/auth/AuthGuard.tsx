@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
+import { AuthLoader } from "./AuthLoader";
 
 interface AuthGuardProps {
     children: React.ReactNode;
@@ -32,7 +33,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     }, [pathname, status, router]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <AuthLoader />;
     }
 
     return <>{children}</>;

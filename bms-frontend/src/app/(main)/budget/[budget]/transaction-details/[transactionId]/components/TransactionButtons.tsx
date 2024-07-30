@@ -1,10 +1,10 @@
 import { LoadingButton } from "@/components/common";
 import { Button } from "@/components/ui/button";
-import { approveTransaction, rejectTransaction } from "@/lib/api/transaction/transaction";
+import { approveTransaction, rejectTransaction, validateTransaction } from "@/lib/api/transaction/transaction";
 import { TransactionDetail, TransactionStatus } from "@/types/transaction";
 import { Session } from "next-auth";
 import { getSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaRegFileAlt } from "react-icons/fa";
 
 export const TransactionButtons = ({ transaction, loadTransaction }: {
@@ -32,7 +32,7 @@ export const TransactionButtons = ({ transaction, loadTransaction }: {
     }
 
     return (
-        <div className="flex flex-col px-4 w-full h-full justify-end">
+        <div className="flex flex-col px-4 w-full h-fill-available justify-end end-0">
             <div className="flex w-full gap-2" >
                 {transaction.status === TransactionStatus.PENDING && <>
                     <RejectButton loadTransaction={loadTransaction} transactionId={transaction.id} />
@@ -85,7 +85,8 @@ const ApprovalButton = ({ transactionId, loadTransaction }: { transactionId: str
 const BackButton = () => {
     return (
         <Button
-            className="text-white w-full"
+            variant="outline"
+            className="border-primary text-primary hover:text-primary w-full"
             onClick={() => {
                 window.history.back();
             }} >
@@ -95,14 +96,53 @@ const BackButton = () => {
 }
 
 const ValidateButton = ({ transactionId, loadTransaction }: { transactionId: string, loadTransaction: (id: string) => void }) => {
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [file, setFile] = useState<File | null>(null);
+
+    const handleButtonClick = () => {
+        fileInputRef?.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = event.target.files?.[0] || null;
+        setFile(selectedFile);
+        if (selectedFile)
+            uploadFile(transactionId, selectedFile);
+    };
+
+    const uploadFile = (transaction: string, file: File) => {
+        setLoading(true);
+        const formData = new FormData();
+        formData.append("file", file);
+        validateTransaction(transaction, formData).then((res) => {
+            if (res) {
+                loadTransaction(transaction);
+            }
+        }).finally(() => {
+            setLoading(false);
+            setFile(null);
+        })
+    };
+
+
     return (
-        <LoadingButton className="bg-destructive  text-white hover:bg-reject-tint w-full hover:text-reject"
-            onClick={() => { }} loading={loading}
-        >
-            <FaRegFileAlt />
-            Validate
-        </LoadingButton>
+        <div className="w-full">
+            <LoadingButton className="bg-success  text-white gap-2 hover:bg-success-tint w-full hover:text-success"
+                onClick={handleButtonClick} loading={loading}
+            >
+                <FaRegFileAlt />
+                Validate
+            </LoadingButton>
+            <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileChange}
+            />
+
+        </div>
+
     );
 }
 

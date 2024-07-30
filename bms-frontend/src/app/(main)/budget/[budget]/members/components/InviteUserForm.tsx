@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-export const InviteUserForm = () => {
+export const InviteUserForm = ({ onFinish }: { onFinish: () => void }) => {
     const { budget } = useParams();
     const [loading, setLoading] = useState(false);
     const inviteUserSchema = z.object({
@@ -23,6 +23,7 @@ export const InviteUserForm = () => {
                     description: "User invited successfully"
                 })
                 inviteUserForm.reset();
+                onFinish();
             }
         }).finally(() => {
             setLoading(false);

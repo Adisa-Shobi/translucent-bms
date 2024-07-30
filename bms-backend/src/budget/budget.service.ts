@@ -476,12 +476,16 @@ export class BudgetService {
     const totalAmount = allTransactions.reduce((sum, t) => sum + t.amount, 0);
     const avgUserExpenditure = totalCount > 0 ? totalAmount / totalCount : 0;
 
+    const sortedExpenditures = processedExpenditures.sort((a, b) =>
+      b.totalTransactions - a.totalTransactions
+    );
+
     return {
       aggregates: {
         avgUserExpenditure,
         totalCount,
       },
-      expenditures: processedExpenditures,
+      expenditures: sortedExpenditures,
     };
   }
 

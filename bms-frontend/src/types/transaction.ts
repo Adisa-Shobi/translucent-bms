@@ -88,29 +88,65 @@ export interface CreateTransactionDto {
 }
 
 // {
-// 	"id": "708a205d-8c33-4e87-b903-0cca7d84952f",
-// 	"transactionId": "SHB-1720950681003",
-// 	"purpose": "More cleaning stuff",
-// 	"amount": 50000,
-// 	"status": "VALIDATED",
-// 	"handlerId": "cb56d8a1-022b-4421-a587-b478f1112501",
-// 	"creatorId": "cb56d8a1-022b-4421-a587-b478f1112501",
-// 	"budgetId": "6d9cacac-ad32-4511-b30e-cad863bcd5df",
-// 	"createdAt": "2024-07-14T09:51:21.004Z",
-// 	"updatedAt": "2024-07-16T07:44:51.890Z",
-// 	"reciept": {
-// 		"id": "1ad02fe6-0a4e-4b32-b286-968a794b567f",
-// 		"fileId": "da76f7e1-1468-47ca-9c63-d825a3ab229e",
-// 		"transactionId": "708a205d-8c33-4e87-b903-0cca7d84952f",
-// 		"createdAt": "2024-07-16T07:44:47.387Z",
-// 		"updatedAt": "2024-07-16T07:44:47.387Z",
-// 		"file": {
-// 			"id": "da76f7e1-1468-47ca-9c63-d825a3ab229e",
-// 			"name": "file",
-// 			"url": "http://res.cloudinary.com/dw5nzq7kb/image/upload/v1721115886/jqvskfqbckgaxw5eql53.pdf",
-// 			"markedDeleted": false,
-// 			"createdAt": "2024-07-16T07:44:46.672Z",
-// 			"updatedAt": "2024-07-16T07:44:46.672Z"
+// 	"aggregates": {
+// 		"avgUserExpenditure": 1333.3333333333333,
+// 		"totalCount": 3
+// 	},
+// 	"expenditures": [
+// 		{
+// 			"id": "af8f8a03-9cbf-468c-96c5-509df52541a4",
+// 			"firstName": "Ademola",
+// 			"lastName": "Oshingbesan",
+// 			"email": "a.oshingbes@alustuden.com",
+// 			"profilePhoto": null,
+// 			"transactions": [],
+// 			"totalTransactions": 0
+// 		},
+// 		{
+// 			"id": "b9f918d6-9c92-49ad-b733-d0fed3292446",
+// 			"firstName": "Shobi",
+// 			"lastName": "Ola-Adisa",
+// 			"email": "johnadisa8@gmail.com",
+// 			"profilePhoto": null,
+// 			"transactions": [],
+// 			"totalTransactions": 0
+// 		},
+// 		{
+// 			"id": "cb56d8a1-022b-4421-a587-b478f1112501",
+// 			"firstName": "Margarett",
+// 			"lastName": "Zboncak",
+// 			"email": "s.oadisa.dev@gmail.com",
+// 			"profilePhoto": null,
+// 			"transactions": [
+// 				{
+// 					"amount": 4000
+// 				}
+// 			],
+// 			"totalTransactions": 4000
 // 		}
-// 	}
+// 	]
 // }
+
+interface Amount {
+  amount: number;
+}
+
+export interface UserExpenditure {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  totalTransactions: number;
+  profilePhoto: string;
+  transactions: Amount[];
+}
+
+interface ExpenditureAggregate {
+  avgUserExpenditure: number;
+  totalCount: string;
+}
+
+export interface UserExpenditureResponse {
+  expenditures: UserExpenditure[];
+  aggregates: ExpenditureAggregate;
+}

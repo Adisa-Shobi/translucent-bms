@@ -6,6 +6,7 @@ interface LoadingButtonProps {
     loading: boolean
     children?: React.ReactNode
     className?: string
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined
     type?: "submit" | "button" | "reset"
     onClick?: () => void
 }
@@ -13,6 +14,7 @@ interface LoadingButtonProps {
 export const LoadingButton = (props: LoadingButtonProps) => {
     return (
         <Button
+            variant={props.variant}
             disabled={props.loading}
             type={props.type}
             className={props.className}

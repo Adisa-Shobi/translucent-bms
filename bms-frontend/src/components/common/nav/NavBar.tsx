@@ -1,7 +1,7 @@
 "use client";
 import { CreateBudgetButton } from "./CreateTransaction";
 import { FreezeBudget } from "./FreezeButton";
-import UserAvatar from "./UserAvatar";
+import UserAvatar from "../avatars/UserAvatar";
 
 export const NavBar = () => {
 
