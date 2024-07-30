@@ -12,6 +12,7 @@ import { generateTransactionID } from "src/utils/helpers";
 import { Pagination } from "src/global-validators";
 import { RecieptService } from "src/reciept/reciept.service";
 import { BudgetService } from "src/budget/budget.service";
+import { visibleFields } from "src/user/user.service";
 
 @Injectable()
 export class TransactionService {
@@ -118,6 +119,9 @@ export class TransactionService {
           status: true,
           amount: true,
           createdAt: true,
+          creator: {
+            select: visibleFields,
+          },
         },
         skip: pagination.skip,
         take: pagination.limit,
@@ -166,6 +170,9 @@ export class TransactionService {
             include: {
               file: true,
             },
+          },
+          creator: {
+            select: visibleFields,
           },
         },
       },

@@ -16,7 +16,6 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { TransactionService } from "./transaction.service";
-import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { Request } from "express";
 import { FileInterceptor } from "@nestjs/platform-express";
 

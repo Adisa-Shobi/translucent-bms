@@ -5,19 +5,19 @@ import { DatabaseService } from "src/database/database.service";
 import { hashPassword } from "src/utils/bcrypt";
 import { Pagination } from "src/global-validators";
 
+export const visibleFields = {
+  id: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  profilePhoto: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
 @Injectable()
 export class UserService {
   constructor(private readonly databaseService: DatabaseService) {}
-
-  visibleFields = {
-    id: true,
-    email: true,
-    firstName: true,
-    lastName: true,
-    profilePhoto: true,
-    createdAt: true,
-    updatedAt: true,
-  };
 
   async create(createUserDto: CreateUserDto) {
     const existingUser = await this.databaseService.user.findUnique(
@@ -31,7 +31,7 @@ export class UserService {
     const password = hashPassword(createUserDto.password);
     return this.databaseService.user.create({
       data: { ...createUserDto, password },
-      select: this.visibleFields,
+      select: visibleFields,
     });
   }
 
@@ -41,7 +41,7 @@ export class UserService {
         where: {
           markedDeleted: false,
         },
-        select: this.visibleFields,
+        select: visibleFields,
         skip: pagination.skip,
         take: pagination.limit,
       },
@@ -55,7 +55,7 @@ export class UserService {
           id,
           markedDeleted: false,
         },
-        select: this.visibleFields,
+        select: visibleFields,
       },
     );
   }
@@ -68,7 +68,7 @@ export class UserService {
           markedDeleted: false,
         },
         data: updateUserDto,
-        select: this.visibleFields,
+        select: visibleFields,
       },
     );
   }
