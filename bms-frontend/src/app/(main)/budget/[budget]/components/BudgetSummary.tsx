@@ -63,17 +63,12 @@ export const BudgetSummary = () => {
                 </div>
                 <div className="flex flex-col justify-center items-center gap-1" >
                     <GaugeChart value={getBalancePercentageFromBalance(summary?.budget.amount || 0, summary?.aggregates.balance || 0)} />
-                    <p className="c-subtitle" >Starting Balance: <span className="c-subheading text-black" >${toMoney(summary?.budget.amount, 0) || 0}</span></p>
+                    <p className="c-subtitle" >Starting Balance: <span className="c-subheading text-black font-semibold" >${toMoney(summary?.budget.amount, 0) || 0}</span></p>
                 </div>
 
             </div>
 
-            <div className="flex w-full justify-between" >
-
-
-
-
-            </div>
+            
 
         </div>
     );
@@ -89,10 +84,10 @@ const AvgWeeklyExp = ({ weekExp, prevWeekExp }: { weekExp?: number, prevWeekExp?
                 Avg Weekly Expenditure
             </p>
             <span className={cn(
-                "flex items-center gap-1",
+                "flex items-center gap-1 font-semibold",
                 incr ? "text-success" : "text-destructive"
             )} >
-                {incr ? <FaCircleArrowUp /> : <FaCircleArrowDown />} {toMoney(weekExp || 0, 1)}
+                {incr ? <FaCircleArrowUp /> : <FaCircleArrowDown />} ${toMoney(weekExp || 0, 1)}
             </span>
         </div>
     );

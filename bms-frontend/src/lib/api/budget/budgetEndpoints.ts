@@ -23,5 +23,7 @@ export const budgetEndpoints = {
       get: (id: string) => `/budget/${id}/summary`,
     },
     post: "/budget",
+    get: (id: string) => `/budget/${id}`,
+    delete: (id: string) => `/budget/${id}`,
   },
 };

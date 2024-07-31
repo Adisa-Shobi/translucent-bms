@@ -16,8 +16,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Transaction, TransactionResponse, TransactionStatus } from "@/types/transaction";
-import { StatusBadge } from "@/components/common";
+import { Transaction, TransactionResponse, TransactionStatus, TransactionCreator } from "@/types/transaction";
+import { StatusBadge, TableSkeleton } from "@/components/common";
 import {
     Pagination,
     PaginationContent,
@@ -37,7 +37,7 @@ export const BudgetTransactionsTable = () => {
     const router = useRouter();
     const [pagination, setPagination] = useState({
         pageIndex: 0,
-        pageSize: 10,
+        pageSize: 5,
     });
     const [totalExpenses, setTotalExpenses] = useState<TransactionResponse>();
     const [loading, setLoading] = useState(false);
@@ -66,7 +66,12 @@ export const BudgetTransactionsTable = () => {
             {
                 id: 'serialNumber',
                 header: 'S/N',
-                cell: ({ row }) => row.index + 1,
+                cell: ({ row, table }) => table.getState().pagination.pageSize * table.getState().pagination.pageIndex + row.index + 1,
+            },
+            {
+                accessorKey: 'creator',
+                header: 'Creator',
+                cell: ({ getValue }) => `${getValue<TransactionCreator>().firstName} ${getValue<TransactionCreator>().lastName}`,
             },
             {
                 accessorKey: 'transactionId',
@@ -114,17 +119,15 @@ export const BudgetTransactionsTable = () => {
         state: {
             pagination: {
                 ...pagination,
-                pageSize: totalExpenses?.transactions.length ?? 0 < pagination.pageSize ? totalExpenses?.transactions?.length ?? 0 : pagination.pageSize,
+                pageSize: pagination.pageSize,
             },
         },
     });
 
     if (loading) {
         return (
-            <div>
-                Loading...
-            </div>
-        )
+            <TableSkeleton rows={5} columns={4} />
+        );
     }
 
     return (

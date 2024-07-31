@@ -59,3 +59,11 @@ export const getAdmins = (id: string) => {
 export const removeAdmin = (id: string, data: any) => {
   return deleteRequest(budgetEndpoints.admin.remove(id), { data });
 };
+
+export const deleteBudget = (id: string) => {
+  return deleteRequest(budgetEndpoints.budget.delete(id));
+};
+
+export const getBudget = (id: string) => {
+  return getRequest(budgetEndpoints.budget.get(id));
+};

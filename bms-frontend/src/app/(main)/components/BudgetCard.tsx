@@ -3,18 +3,19 @@ import { GoPerson, GoTrash } from "react-icons/go";
 import { IoMdMore } from "react-icons/io";
 import React from 'react'
 import { Button } from '@/components/ui/button';
-import { DateRangeBadge } from '@/components/common';
+import { DateRangeBadge, LoadingButton } from '@/components/common';
 import { BalanceBar } from './BalanceBar';
 import { Card } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { deleteBudget } from '@/lib/api/budget/budget';
 
 
 
 
 
 // This component is used to display the budget card
-export const BudgetCard = ({ budget }: { budget: Budget }) => {
+export const BudgetCard = ({ budget, onDelete }: { budget: Budget, onDelete: () => void }) => {
     return (
         <Card
 
@@ -23,7 +24,7 @@ export const BudgetCard = ({ budget }: { budget: Budget }) => {
                 <BudgetCardTitleAndDesc id={budget.id} title={budget.title} description={budget.description} />
                 <div className='flex justify-between' >
                     <BudgetCardMembers members={budget.members} />
-                    <BudgetMenu budgetId={budget.id} />
+                    <BudgetMenu budgetId={budget.id} onDelete={onDelete} />
                 </div>
             </div>
             <div className='mt-12' >
@@ -34,7 +35,19 @@ export const BudgetCard = ({ budget }: { budget: Budget }) => {
     )
 }
 
-const BudgetMenu = ({ budgetId }: { budgetId: string }) => {
+const BudgetMenu = ({ budgetId, onDelete }: { budgetId: string, onDelete: () => void }) => {
+
+    const deleteBudgetReq = (id: string) => {
+        deleteBudget(id).then((res) => {
+            if (res)
+                onDelete();
+        });
+    }
+
+    const handleDelete = () => {
+        deleteBudgetReq(budgetId);
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -55,8 +68,10 @@ const BudgetMenu = ({ budgetId }: { budgetId: string }) => {
                         </a>
                     </DropdownMenuItem>
                     <DropdownMenuItem className='text-destructive items-center'>
-                        <GoTrash size={20} className='mr-3' />
-                        <span>Delete </span>
+                        <span onClick={handleDelete} className='flex' >
+                            <GoTrash size={20} className='mr-3' />
+                            <span>Delete </span>
+                        </span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -65,7 +80,7 @@ const BudgetMenu = ({ budgetId }: { budgetId: string }) => {
 }
 
 // This component is used to display the title and description of the budget
-const BudgetCardTitleAndDesc = ({id, title, description }: {id: string, title: string, description: string }) => {
+const BudgetCardTitleAndDesc = ({ id, title, description }: { id: string, title: string, description: string }) => {
     const router = useRouter();
     return <div
         onClick={() => {

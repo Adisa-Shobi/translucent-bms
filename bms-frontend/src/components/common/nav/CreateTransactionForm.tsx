@@ -26,7 +26,7 @@ export const CreateTransactionForm = ({ budgetId }: { budgetId: string }) => {
                     description: "Transaction created successfully",
                 })
                 createTransactionForm.reset();
-                router.push(`/app/budget/${budgetId}/transactions`);
+                router.push(`/budget/${budgetId}/transactions`);
             }
         }).finally(() => {
             setLoading(false);

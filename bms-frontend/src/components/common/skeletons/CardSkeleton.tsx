@@ -23,3 +23,27 @@ export const SkeletonCard = () => {
     );
 };
 
+export const BudgetSkeletonCard = () => {
+    return (
+      <div className="border border-gray-200 rounded-lg p-4 flex flex-col space-y-4 w-full">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-1/3" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-1/4" />
+          <Skeleton className="h-4 w-1/6" />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-1/3" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-1/4" />
+        </div>
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-6 w-full" />
+      </div>
+    );
+  };

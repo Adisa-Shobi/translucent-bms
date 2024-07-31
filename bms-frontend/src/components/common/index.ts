@@ -17,10 +17,12 @@ export { NavBar } from "../common/nav/NavBar";
 // Badge Components
 export { DateRangeBadge } from "./badges/DateRangeBadge";
 export { StatusBadge } from "./badges/StatusBadge";
+export { SkeletonGrid } from "./skeletons/GridSkeletons";
 
 // Skeleton Components
 export { SkeletonCard } from "./skeletons/CardSkeleton";
 export { SkeletonCardList } from "./skeletons/ListSkeleton";
+export { TableSkeleton } from "./skeletons/TableSkeleton";
 
 // Loader Components
 export { HoneycombLoader } from "./loaders/honey-comb/HoneycombLoader";

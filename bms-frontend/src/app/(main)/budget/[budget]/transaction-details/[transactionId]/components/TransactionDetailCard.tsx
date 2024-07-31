@@ -9,6 +9,7 @@ import { BsCash } from "react-icons/bs";
 export const TransactionDetailCard = ({ transaction }: { transaction: TransactionDetail }) => {
 
     const transactionInfo = [
+        { heading: "Creator", info: `${transaction.creator.firstName} ${transaction.creator.lastName}` },
         { heading: "Purpose", info: transaction?.purpose },
         { heading: "Transaction ID", info: transaction?.transactionId },
         { heading: "Transaction Date", info: toDDMMMYYYY(transaction?.createdAt) },
