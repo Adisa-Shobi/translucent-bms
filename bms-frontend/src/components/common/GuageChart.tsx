@@ -4,10 +4,6 @@ import { Doughnut } from 'react-chartjs-2';
 Chart.register(ArcElement);
 
 export const GaugeChart = ({ value }: { value: number }) => {
-    const radius = 50;
-    const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (value / 100) * circumference;
-    // const rotation = (value / 100) * 180 + 45;
 
     const data: ChartData<"doughnut", number[], unknown> = {
         labels: ['Spent', 'Remaining'],

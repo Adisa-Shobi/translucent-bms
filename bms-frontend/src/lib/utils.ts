@@ -15,7 +15,7 @@ export const getBalancePercentageFromExpense = (
   expenses: number,
 ) => {
   // Calculate the percentage of the balance rounded to whole number
-  return Math.round(((amount - expenses) / amount) * 100);
+  return Number((((amount - expenses) / amount) * 100).toFixed(2));
 };
 
 export const getBalancePercentageFromBalance = (
@@ -23,7 +23,7 @@ export const getBalancePercentageFromBalance = (
   balance: number,
 ) => {
   // Calculate the percentage of the balance rounded to whole number
-  return Math.round((balance / amount) * 100);
+  return Number(((balance / amount) * 100).toFixed(2));
 };
 
 export const toMoney = (
