@@ -4,12 +4,15 @@ import { Separator } from "@/components/ui/separator";
 import { getUserExpenditure } from "@/lib/api/budget/budget";
 import { getInitalsFromName, toMoney } from "@/lib/utils";
 import { UserExpenditure, UserExpenditureResponse } from "@/types/transaction";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { StatSkeleton } from "./StatSkeleton";
 
 export const AvgUserExpense = () => {
-    const { budget } = useParams();
+    // const { budget } = useParams();
     const [loading, setLoading] = useState(false);
+    const searchParams = useSearchParams();
+    const budget_id = searchParams.get("budget_id");
     const [expenditure, setExpenditure] = useState<UserExpenditureResponse>();
 
     const loadUserExpenditure = (budgetId: string) => {
@@ -26,40 +29,33 @@ export const AvgUserExpense = () => {
     }
 
     useEffect(() => {
-        loadUserExpenditure(budget as string);
+        loadUserExpenditure(budget_id as string);
     }, []);
 
-    if (loading) {
-        return (
-            <div>
-                Loading...
-            </div>
-        )
-    }
-
     return (
-        <div className="border rounded-lg p-4 h-[400px]" >
-            <h3 className="c-subheading text-secondary text-base" >
-                Avg User Expense
-            </h3>
-            <h1 className="c-heading-4 mt-3" >
-                ${toMoney(expenditure?.aggregates.avgUserExpenditure, 1)}
-            </h1>
-            <Separator className="mt-4 mb-1 text-secondary" />
-            <h1 className="c-subheading mb-4 text-secondary" >
-                User Expenditure
-            </h1>
-            <div className="flex flex-col gap-2" >
-                {
-                    expenditure?.expenditures.map((itm, index) => {
-                        return (
-                            <UserExpenditureItem key={index} userExpenditure={itm} />
-                        );
-                    })
-                }
+        loading ? <StatSkeleton /> :
+            <div className="border rounded-lg p-4 h-[400px]" >
+                <h3 className="c-subheading text-secondary text-base" >
+                    Avg User Expense
+                </h3>
+                <h1 className="c-heading-4 mt-3" >
+                    {expenditure?.aggregates.currency.symbol}{toMoney(expenditure?.aggregates.avgUserExpenditure, 1)}
+                </h1>
+                <Separator className="mt-4 mb-1 text-secondary" />
+                <h1 className="c-subheading mb-4 text-secondary" >
+                    User Expenditure
+                </h1>
+                <div className="flex flex-col gap-2" >
+                    {
+                        expenditure?.expenditures.map((itm, index) => {
+                            return (
+                                <UserExpenditureItem key={index} userExpenditure={itm} />
+                            );
+                        })
+                    }
 
+                </div>
             </div>
-        </div>
     );
 };
 
@@ -78,7 +74,7 @@ const UserExpenditureItem = ({ userExpenditure }: { userExpenditure: UserExpendi
                 </div>
             </div>
             <p className="c-heading-7" >
-                ${toMoney(userExpenditure.totalTransactions, 2)}
+                {userExpenditure.totalTransactions.currency.symbol}{toMoney(userExpenditure.totalTransactions.amount, 2)}
             </p>
         </div>
     );

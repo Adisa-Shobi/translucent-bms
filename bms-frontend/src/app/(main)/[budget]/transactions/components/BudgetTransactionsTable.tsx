@@ -17,7 +17,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Transaction, TransactionResponse, TransactionStatus, TransactionCreator } from "@/types/transaction";
-import { StatusBadge, TableSkeleton } from "@/components/common";
+import { ExportButton, StatusBadge, TableSkeleton } from "@/components/common";
 import {
     Pagination,
     PaginationContent,
@@ -29,10 +29,13 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from '@/components/ui/button';
 import { getTransactions } from '@/lib/api/budget/budget';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toMoney } from '@/lib/utils';
 
 export const BudgetTransactionsTable = () => {
+    const pathName = usePathname();
+    const searchParams = useSearchParams();
+    const budget_id = searchParams.get("budget_id");
     const { budget } = useParams();
     const router = useRouter();
     const [pagination, setPagination] = useState({
@@ -43,22 +46,25 @@ export const BudgetTransactionsTable = () => {
     const [loading, setLoading] = useState(false);
 
 
-    const loadExpenses = (budgetId: string) => {
-        setLoading(true);
-        getTransactions(budgetId, {
-            limit: pagination.pageSize,
-            skip: pagination.pageIndex * pagination.pageSize,
+    const loadExpenses = (budgetId: string, limit: Number, skip: Number) => {
+
+        return getTransactions(budgetId, {
+            limit,
+            skip
         }).then((res) => {
+            return res;
+        })
+    }
+
+    React.useEffect(() => {
+        setLoading(true);
+        loadExpenses(budget_id as string, pagination.pageSize, pagination.pageIndex * pagination.pageSize).then((res) => {
             if (res) {
                 setTotalExpenses(res);
             }
         }).finally(() => {
             setLoading(false);
         });
-    }
-
-    React.useEffect(() => {
-        loadExpenses(budget as string);
     }, [pagination]);
 
     const columns = React.useMemo<ColumnDef<Transaction>[]>(
@@ -74,13 +80,18 @@ export const BudgetTransactionsTable = () => {
                 cell: ({ getValue }) => `${getValue<TransactionCreator>().firstName} ${getValue<TransactionCreator>().lastName}`,
             },
             {
+                accessorKey: 'purpose',
+                header: 'Purpose',
+                cell: ({ getValue }) => getValue<string>(),
+            },
+            {
                 accessorKey: 'transactionId',
                 header: 'Transaction ID',
             },
             {
                 accessorKey: 'amount',
                 header: 'Amount',
-                cell: ({ getValue }) => `$${toMoney(getValue<number>())}`,
+                cell: ({ getValue, row }) => `${row.original.budget.currency.symbol}${toMoney(getValue<number>())}`,
             },
             {
                 accessorKey: 'status',
@@ -96,10 +107,9 @@ export const BudgetTransactionsTable = () => {
                 id: 'action',
                 header: 'Action',
                 cell: ({ row }) => {
-                    console.log(row.original);
                     return (
                         <Button variant='ghost' onClick={() => {
-                            router.push(`/budget/${budget}/transaction-details/${row.original.id}`)
+                            router.push(`${pathName}/${row.original.transactionId}?transaction_id=${row.original.id}&${searchParams.toString()}`);
                         }} className='text-primary font-semibold' >Details</Button>
                     );
                 },
@@ -131,7 +141,26 @@ export const BudgetTransactionsTable = () => {
     }
 
     return (
-        <div className="p-4">
+        <div className="py-4">
+            <div className='w-full flex justify-end mb-2' >
+                <ExportButton getData={() => {
+                    return loadExpenses(budget_id as string, Number.POSITIVE_INFINITY, 0).then((res) => {
+                        if (res) {
+                            return res.transactions.map((transaction: Transaction) => {
+                                return {
+                                    'Creator': `${transaction.creator.firstName} ${transaction.creator.lastName}`,
+                                    'Creator email': transaction.creator.email,
+                                    'Purpose': transaction.purpose,
+                                    'Transaction ID': transaction.transactionId,
+                                    'Amount': `${transaction.budget.currency.symbol}${toMoney(transaction.amount)}`,
+                                    'Status': transaction.status,
+                                    'Date & Time': new Date(transaction.createdAt).toLocaleString(),
+                                };
+                            });
+                        }
+                    });
+                }} title={`${decodeURIComponent(budget as string)}`} />
+            </div>
             <Table>
                 <TableCaption>A list of recent transactions that occurred on this budget.</TableCaption>
                 <TableHeader>

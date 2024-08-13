@@ -234,6 +234,10 @@ export class BudgetController {
       Prisma.EnumTransactionStatusFilter,
     @Req() req: Request,
   ) {
+    const budget = await this.budgetService.findOne(id);
+
+    if (!budget) throw new NotFoundException("Budget does not exist");
+
     const pagination = retrievePagination(req);
     const transactions = await this.transactionService.findBudgetTransactions(
       id,
@@ -256,7 +260,10 @@ export class BudgetController {
     return {
       aggregates: {
         count: transactionCount,
-        total: totalExpenses,
+        total: {
+          currency: budget.currency,
+          amount: totalExpenses,
+        },
       },
       transactions,
     };

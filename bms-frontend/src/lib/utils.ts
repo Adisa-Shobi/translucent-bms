@@ -35,8 +35,6 @@ export const toMoney = (
     // Convert the number to a string with 2 decimal places
     const formatted = amount?.toFixed(decimals);
 
-    console.log("formatted", formatted);
-
     // Split the string into whole and decimal parts
     const [whole, decimal] = (formatted ?? "").split(".");
 

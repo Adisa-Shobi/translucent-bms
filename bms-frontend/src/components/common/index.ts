@@ -10,6 +10,7 @@ export { SelectInput } from "./form/SelectInput";
 
 // Button Components
 export { LoadingButton } from "./button/LoadingButton";
+export { ExportButton } from "./button/ExportButton"
 
 // Navbar Components
 export { NavBar } from "../common/nav/NavBar";

@@ -9,8 +9,8 @@ import { useSession } from "next-auth/react";
 import { Budget } from "@/types/budget";
 import { BudgetCard } from "./components/BudgetCard";
 import { useRouter } from "next/navigation";
-import { BudgetSkeletonCard } from "@/components/common/skeletons/CardSkeleton";
 import { SkeletonGrid } from "@/components/common";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 function Home() {
   const [filter, setFilter] = useState({
@@ -18,17 +18,21 @@ function Home() {
     adminBudgets: true,
     memberBudgets: true,
   });
+  const INCR_SIZE = 6;
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [total, setCount] = useState(0);
+  const [showCount, setShowCount] = useState(INCR_SIZE);
   const { data: sessionData } = useSession();
 
   const fetchBudgets = (id: string, params: any) => {
     setLoading(true);
     getUserBudgets(id, params).then((res) => {
       if (res) {
-        setBudgets(res);
+        setBudgets(res?.budgets);
+        setCount(res?.aggregates?.count);
       }
     }).finally(() => {
       setLoading(false);
@@ -37,9 +41,17 @@ function Home() {
 
   useEffect(() => {
     if (sessionData) {
-      fetchBudgets(sessionData.user.id, filter);
+      fetchBudgets(sessionData.user.id, { limit: showCount, ...filter });
     }
-  }, [filter])
+  }, [filter, showCount]);
+
+  const handleSeeMore = () => {
+    if (showCount < total) {
+      setShowCount(showCount + INCR_SIZE);
+    } else {
+      setShowCount(INCR_SIZE);
+    }
+  }
 
 
   const filterBudgets = budgets.filter((bgt) => {
@@ -64,17 +76,20 @@ function Home() {
         </Button>
       </div>
       {
-        loading ? <SkeletonGrid /> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8 flex-wrap pb-10" >
-
-          {filterBudgets.map((bgt, index) => {
-            return (
-              <BudgetCard key={index} budget={bgt} onDelete={() => {
-                sessionData?.user.id && fetchBudgets(sessionData.user.id, filter);
-              }} />
-            )
-          })
-          }
-        </div>
+        loading ? <SkeletonGrid /> :
+          <div className="flex flex-col items-center pb-2 gap-4" >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8 w-full" >
+              {filterBudgets.map((bgt, index) => {
+                return (
+                  <BudgetCard key={index} budget={bgt} onDelete={() => {
+                    sessionData?.user.id && fetchBudgets(sessionData.user.id, filter);
+                  }} />
+                )
+              })
+              }
+            </div>
+            <Button className="text-white w-min gap-1" onClick={handleSeeMore}>{showCount < total ? <><IoIosArrowDown /> View More</> : <><IoIosArrowUp /> View Less</>}</Button>
+          </div>
       }
     </div>
   );

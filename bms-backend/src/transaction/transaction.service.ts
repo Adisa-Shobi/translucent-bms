@@ -103,12 +103,6 @@ export class TransactionService {
       filter.status = status;
     }
 
-    const budget = await this.databaseService.budget.findUnique({
-      where: { id: budgetId },
-    });
-
-    if (!budget) throw new NotFoundException("Budget does not exist");
-
     return this.databaseService.transaction.findMany(
       {
         where: filter,
@@ -121,6 +115,11 @@ export class TransactionService {
           createdAt: true,
           creator: {
             select: visibleFields,
+          },
+          budget: {
+            select: {
+              currency: true,
+            },
           },
         },
         skip: pagination.skip,
@@ -166,6 +165,11 @@ export class TransactionService {
       {
         where: { id },
         include: {
+          budget: {
+            select: {
+              currency: true,
+            }
+          },
           reciept: {
             include: {
               file: true,
@@ -300,6 +304,10 @@ export class TransactionService {
       throw new UnauthorizedException("Admin access required");
     }
 
+    if (transaction.budget.isFrozen) {
+      throw new BadRequestException("Budget is frozen");
+    }
+
     if (transaction.status !== "PENDING") {
       throw new BadRequestException(
         `Transaction has been ${transaction.status}`,
@@ -345,8 +353,12 @@ export class TransactionService {
       throw new UnauthorizedException("Admin access required");
     }
 
+    if (transaction.budget.isFrozen) {
+      throw new BadRequestException("Budget is frozen");
+    }
+
     if (transaction.status !== "PENDING") {
-      throw new BadRequestException("Transaction is not pending");
+      throw new BadRequestException(`Transaction is ${transaction.status}`);
     }
 
     return this.databaseService.transaction.update({
@@ -383,13 +395,22 @@ export class TransactionService {
       },
     });
     if (!transaction) throw new NotFoundException("Transaction does not exist");
-    if (transaction.status === "VALIDATED") {
-      throw new BadRequestException("Transaction has already been validated");
-    } else if (transaction.status !== "APPROVED") {
-      throw new BadRequestException(
-        "Transaction must be approved before validation",
-      );
+
+    if (
+      transaction.budget.admins.length === 0 &&
+      transaction.budget.owner.id !== handlerId
+    ) {
+      throw new UnauthorizedException("Admin access required");
     }
+
+    if (transaction.budget.isFrozen) {
+      throw new BadRequestException("Budget is frozen");
+    }
+    
+    if (transaction.status !== "APPROVED") {
+      throw new BadRequestException(`Transaction is ${transaction.status}`);
+    } 
+    
     const reciept = await this.recieptService.create(transaction.id, file);
 
     return this.databaseService.transaction.update({

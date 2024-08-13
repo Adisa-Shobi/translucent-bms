@@ -1,15 +1,16 @@
 import { freezeBudget, getBudget, unfreezeBudget } from "@/lib/api/budget/budget";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState, useCallback } from "react";
 import { debounce } from "lodash";
 import { toast } from "@/components/ui/use-toast";
 
-export const FreezeBudget = () => {
-    const { budget } = useParams();
+export const FreezeBudget = () => { 
+    const searchParams = useSearchParams();
+    const budget_id = searchParams.get("budget_id");
     const [checked, setChecked] = useState(false);
-    const showFreeze = budget ? true : false;
+    const showFreeze = budget_id ? true : false;
 
     const debouncedHandleChange = useCallback(
         debounce((checked, budget) => {
@@ -25,7 +26,7 @@ export const FreezeBudget = () => {
     const handleChange = () => {
         const newChecked = !checked;
         setChecked(newChecked);
-        debouncedHandleChange(newChecked, budget);
+        debouncedHandleChange(newChecked, budget_id);
     };
 
     const handleFreeze = (id: any) => {
@@ -67,8 +68,8 @@ export const FreezeBudget = () => {
     };
 
     useEffect(() => {
-        getBudgetReq(budget);
-    }, [budget]);
+        getBudgetReq(budget_id);
+    }, [budget_id]);
 
     return (
         <div className={`flex items-center space-x-2 ${showFreeze ? "visible" : "invisible"}`}>

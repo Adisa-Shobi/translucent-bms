@@ -10,6 +10,8 @@ import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { FileModule } from './file/file.module';
 import { CurrencyModule } from './currency/currency.module';
+import { MailerService } from './mailer/mailer.service';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -22,7 +24,8 @@ import { CurrencyModule } from './currency/currency.module';
     CloudinaryModule,
     FileModule,
     CurrencyModule,
+    MailerModule,
   ],
-  providers: [RecieptService, CloudinaryService],
+  providers: [RecieptService, CloudinaryService, MailerService],
 })
 export class AppModule {}

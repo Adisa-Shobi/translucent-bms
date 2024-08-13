@@ -4,6 +4,8 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { DatabaseService } from "src/database/database.service";
 import { hashPassword } from "src/utils/bcrypt";
 import { Pagination } from "src/global-validators";
+import { MailerService } from "src/mailer/mailer.service";
+import configuration from "src/config/configuration";
 
 export const visibleFields = {
   id: true,
@@ -17,7 +19,10 @@ export const visibleFields = {
 
 @Injectable()
 export class UserService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly mailerService: MailerService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const existingUser = await this.databaseService.user.findUnique(
@@ -26,13 +31,32 @@ export class UserService {
       },
     );
 
-    if (existingUser) return null
+    if (existingUser) return null;
 
     const password = hashPassword(createUserDto.password);
-    return this.databaseService.user.create({
+    const user = await this.databaseService.user.create({
       data: { ...createUserDto, password },
       select: visibleFields,
     });
+
+    this.mailerService.sendEmail({
+      from: {
+        name: `Shobi from ${configuration.app.name}`,
+        address: configuration.mail.defaultFrom,
+      },
+      placeholderReplacements: {
+        firstName: user.firstName,
+        appName: configuration.app.name,
+      },
+      html: "<p>Hi {firstName}, </p><p>Welcome to {appName}.</p>",
+      recipients: [{
+        name: `${user.firstName} ${user.lastName}`,
+        address: user.email,
+      }],
+      subject: `Welcome to ${configuration.app.name}`,
+    });
+
+    return user;
   }
 
   async findAll(pagination: Pagination) {

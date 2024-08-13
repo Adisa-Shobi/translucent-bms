@@ -1,3 +1,5 @@
+import { Currency } from "./currency";
+
 export interface Transaction {
   id: string;
   purpose: string;
@@ -6,6 +8,9 @@ export interface Transaction {
   amount: number;
   createdAt: string;
   creator: TransactionCreator;
+  budget: {
+    currency: Currency;
+  }
 }
 
 export interface TransactionCreator {
@@ -20,7 +25,10 @@ export interface TransactionCreator {
 
 interface TransactionAggregate {
   count: number;
-  total: number;
+  total: {
+    amount: number;
+    currency: Currency;
+  };
 }
 
 export interface TransactionResponse {
@@ -75,12 +83,18 @@ export interface UserExpenditure {
   firstName: string;
   lastName: string;
   email: string;
-  totalTransactions: number;
+  totalTransactions: TotalTransactions;
   profilePhoto: string;
   transactions: Amount[];
 }
 
+interface TotalTransactions {
+  amount: number;
+  currency: Currency;
+}
+
 interface ExpenditureAggregate {
+  currency: Currency;
   avgUserExpenditure: number;
   totalCount: string;
 }

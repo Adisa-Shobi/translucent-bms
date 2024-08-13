@@ -1,3 +1,5 @@
+import { Currency } from "./currency";
+
 interface Aggregates {
   totalExpenses: number;
   pendingExpenses: number;
@@ -17,6 +19,7 @@ interface Budget {
   createdAt: string;
   updatedAt: string;
   endAt: string;
+  currency: Currency;
 }
 
 export interface BudgetSummaryType {

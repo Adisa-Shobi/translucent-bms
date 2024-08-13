@@ -72,7 +72,12 @@ export class BudgetService {
   }
 
   findOne(id: string) {
-    return this.databaseService.budget.findUnique({ where: { id } });
+    return this.databaseService.budget.findUnique({
+      where: { id },
+      include: {
+        currency: true,
+      },
+    });
   }
 
   async update(id: string, updateBudgetDto: UpdateBudgetDto, userId: string) {
@@ -413,6 +418,9 @@ export class BudgetService {
   async getExpenditureByUser(id: string, pagination: Pagination) {
     const budget = await this.databaseService.budget.findUnique({
       where: { id },
+      include: {
+        currency: true,
+      },
     });
 
     if (!budget) {
@@ -439,6 +447,11 @@ export class BudgetService {
           },
           select: {
             amount: true,
+            budget: {
+              select: {
+                currency: true,
+              },
+            },
           },
         },
       },
@@ -448,10 +461,13 @@ export class BudgetService {
 
     const processedExpenditures = expenditures.map((user) => ({
       ...user,
-      totalTransactions: user.transactions.reduce(
-        (sum, t) => sum + t.amount,
-        0,
-      ),
+      totalTransactions: {
+        currency: budget.currency,
+        amount: user.transactions.reduce(
+          (sum, t) => sum + t.amount,
+          0,
+        ),
+      }
     }));
 
     const totalCount = await this.databaseService.user.count({
@@ -477,11 +493,12 @@ export class BudgetService {
     const avgUserExpenditure = totalCount > 0 ? totalAmount / totalCount : 0;
 
     const sortedExpenditures = processedExpenditures.sort((a, b) =>
-      b.totalTransactions - a.totalTransactions
+      b.totalTransactions.amount - a.totalTransactions.amount,
     );
 
     return {
       aggregates: {
+        currency: budget.currency,
         avgUserExpenditure,
         totalCount,
       },
@@ -584,11 +601,21 @@ export class BudgetService {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       skip: pagination?.skip,
       take: pagination?.limit,
     });
 
-    return budgets.map((budget) => {
+    const count = await this.databaseService.budget.count({
+      where: {
+        OR: filters_or,
+        ...filters_and,
+      },
+    });
+
+    const userBudgets = budgets.map((budget) => {
       const expenses = budget.transactions.reduce(
         (acc, transaction) => acc + transaction.amount,
         0,
@@ -599,6 +626,13 @@ export class BudgetService {
         expenses,
       };
     });
+
+    return {
+      aggregates: {
+        count,
+      },
+      budgets: userBudgets,
+    };
   }
 
   async getBudgetMembers(id: string) {

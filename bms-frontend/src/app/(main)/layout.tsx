@@ -1,4 +1,5 @@
 import { NavBar } from '@/components/common';
+import { NavBreadCrumb } from '@/components/common/NavBreadCrumb';
 import React from 'react'
 
 export default function layout({ children }: Readonly<{
@@ -8,7 +9,8 @@ export default function layout({ children }: Readonly<{
         <>
             <NavBar />
             <main>
-                <div className='px-12 pt-12'>
+                <div className='px-12'>
+                    <NavBreadCrumb />
                     {children}
                 </div>
             </main>

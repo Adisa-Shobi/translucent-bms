@@ -6,7 +6,7 @@ export default function BudgetTransactions() {
         <div>
             <h1 className='c-heading-4' >Budget Transactions</h1>
             <p className='c-subheading text-secondary' >Track all transactions made within your budget</p>
-            <div className='mt-8' >
+            <div className='mt-2' >
                 <BudgetTransactionsTable />
             </div>
         </div>
