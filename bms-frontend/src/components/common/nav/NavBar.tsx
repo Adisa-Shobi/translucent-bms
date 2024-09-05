@@ -1,5 +1,5 @@
 "use client";
-import { CreateBudgetButton } from "./CreateTransaction";
+import { CreateTransactionButton } from "./CreateTransaction";
 import { FreezeBudget } from "./FreezeButton";
 import UserAvatar from "../avatars/UserAvatar";
 
@@ -15,7 +15,7 @@ export const NavBar = () => {
 
             <div className="flex items-center w-2/6 justify-between" >
                 <FreezeBudget />
-                <CreateBudgetButton />
+                <CreateTransactionButton />
                 <UserAvatar />
             </div>
 

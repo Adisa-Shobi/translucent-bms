@@ -10,7 +10,7 @@ import { createTransaction } from "@/lib/api/budget/budget";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 
-export const CreateTransactionForm = ({ budgetId }: { budgetId: string }) => {
+export const CreateTransactionForm = ({ budget, budgetId, closeModal }: { budget: string, budgetId: string, closeModal: () => void }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const createTransactionSchema = z.object({
@@ -26,7 +26,8 @@ export const CreateTransactionForm = ({ budgetId }: { budgetId: string }) => {
                     description: "Transaction created successfully",
                 })
                 createTransactionForm.reset();
-                router.push(`/budget/${budgetId}/transactions`);
+                closeModal();
+                router.push(`${budget}/transactions?budget_id=${budgetId}`);
             }
         }).finally(() => {
             setLoading(false);
