@@ -12,11 +12,11 @@ export class AuthService {
   ) {}
 
   async validateUser({ email, password }: AuthPayloadDto) {
-    const deletedUser = await this.databaseService.user.findUnique({
+    const deletedUser = await this.databaseService.client.user.findUnique({
       where: { email, markedDeleted: true },
     });
     if (deletedUser) return null;
-    const findUser = await this.databaseService.user.findUnique({
+    const findUser = await this.databaseService.client.user.findUnique({
       where: {
         email,
       },
@@ -31,13 +31,13 @@ export class AuthService {
   }
 
   async recoverUserAccount({ email, password }: AuthPayloadDto) {
-    const user = await this.databaseService.user.findUnique({
+    const user = await this.databaseService.client.user.findUnique({
       where: { email },
     });
     if (!user) return null;
     const isMatch = comparePassword(password, user.password);
     if (isMatch) {
-      const updatedUser = await this.databaseService.user.update({
+      const updatedUser = await this.databaseService.client.user.update({
         where: { email },
         data: { markedDeleted: false },
       });

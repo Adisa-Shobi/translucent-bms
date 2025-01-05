@@ -11,7 +11,7 @@ export class RecieptService {
 
   async create(transactionId: string, file: Express.Multer.File) {
     const fileData = await this.fileService.saveFile(file);
-    return this.databaseService.reciept.create({
+    return this.databaseService.client.reciept.create({
       data: {
         transaction: {
           connect: {

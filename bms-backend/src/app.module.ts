@@ -12,6 +12,7 @@ import { FileModule } from './file/file.module';
 import { CurrencyModule } from './currency/currency.module';
 import { MailerService } from './mailer/mailer.service';
 import { MailerModule } from './mailer/mailer.module';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MailerModule } from './mailer/mailer.module';
     FileModule,
     CurrencyModule,
     MailerModule,
+    OtpModule,
   ],
   providers: [RecieptService, CloudinaryService, MailerService],
 })

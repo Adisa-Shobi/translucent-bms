@@ -8,7 +8,7 @@ export class CurrencyService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async getCurrencies(pagination: Pagination) {
-    return this.databaseService.currency.findMany(
+    return this.databaseService.client.currency.findMany(
       {
         skip: pagination.skip,
         take: pagination.limit,
@@ -17,6 +17,6 @@ export class CurrencyService {
   }
 
   async getCurrencyById(id: number) {
-    return this.databaseService.currency.findUnique({ where: { id } });
+    return this.databaseService.client.currency.findUnique({ where: { id } });
   }
 }

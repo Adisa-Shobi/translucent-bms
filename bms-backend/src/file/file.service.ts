@@ -15,7 +15,7 @@ export class FileService {
     if (result instanceof Error) {
       throw result;
     }
-    return this.databaseService.file.create(
+    return this.databaseService.client.file.create(
       {
         data: {
           name: result.original_filename,

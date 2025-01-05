@@ -22,6 +22,7 @@ model User {
   email               String         @unique
   password            String
   profilePhoto        String?
+  otp                 Otp?
   budgets             Budget[]
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
@@ -161,4 +162,18 @@ enum TransactionStatus {
   APPROVED
   REJECTED
   VALIDATED
+}
+
+// ------------------------------------------------------------------------------
+
+// --------------------------------- OTP ----------------------------------------
+
+model Otp {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  code      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
 }

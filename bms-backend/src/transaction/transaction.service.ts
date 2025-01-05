@@ -26,7 +26,7 @@ export class TransactionService {
     creatorId: string,
     budgetId: string,
   ) {
-    const budget = await this.databaseService.budget.findFirst({
+    const budget = await this.databaseService.client.budget.findFirst({
       where: {
         id: budgetId,
       },
@@ -60,7 +60,7 @@ export class TransactionService {
     if (budget.isFrozen) throw new BadRequestException("Budget is frozen");
 
     const transactionId = generateTransactionID();
-    return this.databaseService.transaction.create({
+    return this.databaseService.client.transaction.create({
       data: {
         ...createTransactionDto,
         creator: {
@@ -103,7 +103,7 @@ export class TransactionService {
       filter.status = status;
     }
 
-    return this.databaseService.transaction.findMany(
+    return this.databaseService.client.transaction.findMany(
       {
         where: filter,
         select: {
@@ -153,7 +153,7 @@ export class TransactionService {
       filter.status = status;
     }
 
-    return this.databaseService.transaction.findMany({
+    return this.databaseService.client.transaction.findMany({
       where: filter,
       skip: pagination.skip,
       take: pagination.limit,
@@ -161,7 +161,7 @@ export class TransactionService {
   }
 
   async findOne(id: string) {
-    const transaction = await this.databaseService.transaction.findUnique(
+    const transaction = await this.databaseService.client.transaction.findUnique(
       {
         where: { id },
         include: {
@@ -210,7 +210,7 @@ export class TransactionService {
       filter.status = status;
     }
 
-    return this.databaseService.transaction.findMany({
+    return this.databaseService.client.transaction.findMany({
       where: filter,
       skip: pagination.skip,
       take: pagination.limit,
@@ -227,7 +227,7 @@ export class TransactionService {
   // }
 
   async getTransactionBudget(id: string) {
-    return this.databaseService.transaction.findUnique({
+    return this.databaseService.client.transaction.findUnique({
       where: { id },
       select: {
         budget: true,
@@ -236,7 +236,7 @@ export class TransactionService {
   }
 
   async isUserTransactionBudgetOwner(id, userId) {
-    return this.databaseService.transaction.findUnique({
+    return this.databaseService.client.transaction.findUnique({
       where: {
         id,
         budget: {
@@ -249,7 +249,7 @@ export class TransactionService {
   }
 
   async isUserTransactionBudgetAdmin(id, userId) {
-    return this.databaseService.transaction.findUnique({
+    return this.databaseService.client.transaction.findUnique({
       where: {
         id,
         budget: {
@@ -264,7 +264,7 @@ export class TransactionService {
   }
 
   async isUserTransactionBudgetMember(id, userId) {
-    return this.databaseService.transaction.findUnique({
+    return this.databaseService.client.transaction.findUnique({
       where: {
         id,
         budget: {
@@ -279,7 +279,7 @@ export class TransactionService {
   }
 
   async approveTransaction(id: string, handlerId: string) {
-    const transaction = await this.databaseService.transaction.findUnique({
+    const transaction = await this.databaseService.client.transaction.findUnique({
       where: { id },
       include: {
         budget: {
@@ -314,7 +314,7 @@ export class TransactionService {
       );
     }
 
-    return this.databaseService.transaction.update({
+    return this.databaseService.client.transaction.update({
       where: { id },
       data: {
         status: "APPROVED",
@@ -328,7 +328,7 @@ export class TransactionService {
   }
 
   async rejectTransaction(id: string, handlerId: string) {
-    const transaction = await this.databaseService.transaction.findUnique({
+    const transaction = await this.databaseService.client.transaction.findUnique({
       where: { id },
       include: {
         budget: {
@@ -361,7 +361,7 @@ export class TransactionService {
       throw new BadRequestException(`Transaction is ${transaction.status}`);
     }
 
-    return this.databaseService.transaction.update({
+    return this.databaseService.client.transaction.update({
       where: { id },
       data: {
         status: "REJECTED",
@@ -379,7 +379,7 @@ export class TransactionService {
     file: Express.Multer.File,
     handlerId: string,
   ) {
-    const transaction = await this.databaseService.transaction.findUnique({
+    const transaction = await this.databaseService.client.transaction.findUnique({
       where: { id },
       include: {
         budget: {
@@ -413,7 +413,7 @@ export class TransactionService {
     
     const reciept = await this.recieptService.create(transaction.id, file);
 
-    return this.databaseService.transaction.update({
+    return this.databaseService.client.transaction.update({
       where: { id },
       include: {
         reciept: {
@@ -434,7 +434,7 @@ export class TransactionService {
   }
 
   async getAvgExpensePerUser(id: string) {
-    const transactionsGroupedByUser = await this.databaseService.transaction
+    const transactionsGroupedByUser = await this.databaseService.client.transaction
       .groupBy({
         by: "creatorId",
         where: {
@@ -487,7 +487,7 @@ export class TransactionService {
       });
     });
 
-    return (await this.databaseService.transaction.aggregate({
+    return (await this.databaseService.client.transaction.aggregate({
       where: {
         ...filter,
         OR: filter_or,
@@ -497,7 +497,7 @@ export class TransactionService {
   }
 
   async getPendingBudgetExpenses(id: string) {
-    return (await this.databaseService.transaction.aggregate({
+    return (await this.databaseService.client.transaction.aggregate({
       where: {
         budget: {
           id,
@@ -534,7 +534,7 @@ export class TransactionService {
       filter.status = status;
     }
 
-    return this.databaseService.transaction.count({
+    return this.databaseService.client.transaction.count({
       where: filter,
     });
   }

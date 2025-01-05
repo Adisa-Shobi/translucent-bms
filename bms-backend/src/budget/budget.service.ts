@@ -7,11 +7,8 @@ import { CreateBudgetDto } from "./dto/create-budget.dto";
 import { UpdateBudgetDto } from "./dto/update-budget.dto";
 import { DatabaseService } from "src/database/database.service";
 import { Pagination } from "src/global-validators";
-import moment from "moment";
 import { TransactionService } from "src/transaction/transaction.service";
 import { CurrencyService } from "src/currency/currency.service";
-import { emit } from "process";
-import { convertBigIntToString } from "src/utils/helpers";
 
 @Injectable()
 export class BudgetService {
@@ -34,7 +31,7 @@ export class BudgetService {
     }
 
     // Check if budget with the same title exists
-    const budget = await this.databaseService.budget.findFirst({
+    const budget = await this.databaseService.client.budget.findFirst({
       where: {
         title: data.title,
         ownerId,
@@ -44,7 +41,7 @@ export class BudgetService {
       throw new BadRequestException("Budget with this title already exists");
     }
 
-    return this.databaseService.budget.create({
+    return this.databaseService.client.budget.create({
       data: {
         ...data,
         currency: {
@@ -62,7 +59,7 @@ export class BudgetService {
   }
 
   findUserBudgets(userId: string) {
-    return this.databaseService.budget.findMany({
+    return this.databaseService.client.budget.findMany({
       where: {
         owner: {
           id: userId,
@@ -72,7 +69,7 @@ export class BudgetService {
   }
 
   findOne(id: string) {
-    return this.databaseService.budget.findUnique({
+    return this.databaseService.client.budget.findUnique({
       where: { id },
       include: {
         currency: true,
@@ -81,7 +78,7 @@ export class BudgetService {
   }
 
   async update(id: string, updateBudgetDto: UpdateBudgetDto, userId: string) {
-    const budget = this.databaseService.budget.findUnique({
+    const budget = this.databaseService.client.budget.findUnique({
       where: { id, ownerId: userId },
     });
 
@@ -94,7 +91,7 @@ export class BudgetService {
     if (updateBudgetDto.title) {
       updateBudgetDto.title = updateBudgetDto.title.trim();
 
-      const similarBudget = await this.databaseService.budget.findFirst({
+      const similarBudget = await this.databaseService.client.budget.findFirst({
         where: {
           title: updateBudgetDto.title,
           ownerId: userId,
@@ -108,14 +105,14 @@ export class BudgetService {
       }
     }
 
-    return this.databaseService.budget.update({
+    return this.databaseService.client.budget.update({
       where: { id },
       data: updateBudgetDto,
     });
   }
 
   async remove(id: string, operatorId: string) {
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: { id },
     });
 
@@ -127,11 +124,11 @@ export class BudgetService {
       throw new UnauthorizedException("Only budget owner can delete budget");
     }
 
-    return this.databaseService.budget.delete({ where: { id } });
+    return this.databaseService.client.budget.delete({ where: { id } });
   }
 
   async freezeBudget(id: string, userId: string) {
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: { id },
     });
     if (!budget) {
@@ -143,14 +140,14 @@ export class BudgetService {
     if (budget.isFrozen) {
       throw new BadRequestException("Budget is already frozen");
     }
-    return this.databaseService.budget.update({
+    return this.databaseService.client.budget.update({
       where: { id },
       data: { isFrozen: true },
     });
   }
 
   async unfreezeBudget(id: string, userId: string) {
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: { id },
     });
     if (!budget) {
@@ -162,14 +159,14 @@ export class BudgetService {
     if (!budget.isFrozen) {
       throw new BadRequestException("Budget is not frozen");
     }
-    return this.databaseService.budget.update({
+    return this.databaseService.client.budget.update({
       where: { id },
       data: { isFrozen: false },
     });
   }
 
   addTransaction(id: string, transactionId: string) {
-    return this.databaseService.budget.update({
+    return this.databaseService.client.budget.update({
       where: { id },
       data: { transactions: { connect: { id: transactionId } } },
     });
@@ -177,12 +174,12 @@ export class BudgetService {
 
   async getBudgetBalance(id: string) {
     const expenses = await this.transactionService.getTotalBudgetExpenses(id);
-    return (await this.databaseService.budget.findUnique({ where: { id } }))
+    return (await this.databaseService.client.budget.findUnique({ where: { id } }))
       .amount - expenses;
   }
 
   async getAvgExpense(id: string, createdAt?: Date, updatedAt?: Date) {
-    return (await this.databaseService.transaction.aggregate({
+    return (await this.databaseService.client.transaction.aggregate({
       where: {
         budgetId: id,
         createdAt: {
@@ -205,7 +202,7 @@ export class BudgetService {
   }
 
   async addMember(id: string, memberEmail: string, operatorId: string) {
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: {
         id,
         OR: [
@@ -229,7 +226,7 @@ export class BudgetService {
       );
     }
 
-    const user = await this.databaseService.user.findFirst({
+    const user = await this.databaseService.client.user.findFirst({
       where: { email: memberEmail },
     });
 
@@ -237,7 +234,7 @@ export class BudgetService {
       throw new BadRequestException("User not found");
     }
 
-    return this.databaseService.budget.update({
+    return this.databaseService.client.budget.update({
       where: { id },
       data: {
         members: {
@@ -256,7 +253,7 @@ export class BudgetService {
   }
 
   async addAdmin(id: string, adminEmail: string, operatorId: string) {
-    const user = await this.databaseService.user.findFirst({
+    const user = await this.databaseService.client.user.findFirst({
       where: { email: adminEmail },
     });
 
@@ -264,7 +261,7 @@ export class BudgetService {
       throw new BadRequestException("User not found");
     }
 
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: {
         id,
         ownerId: operatorId,
@@ -292,7 +289,7 @@ export class BudgetService {
       );
     }
 
-    return this.databaseService.budget.update({
+    return this.databaseService.client.budget.update({
       where: { id },
       data: {
         admins: {
@@ -311,7 +308,7 @@ export class BudgetService {
   }
 
   async removeMember(id: string, memberEmail: string, operatorId: string) {
-    const budget = await this.databaseService.budget.findFirst({
+    const budget = await this.databaseService.client.budget.findFirst({
       where: {
         id,
         ownerId: operatorId,
@@ -337,7 +334,7 @@ export class BudgetService {
       throw new BadRequestException("User is not a member of the budget");
     }
 
-    return this.databaseService.budgetMember.deleteMany({
+    return this.databaseService.client.budgetMember.deleteMany({
       where: {
         budgetId: id,
         user: {
@@ -354,7 +351,7 @@ export class BudgetService {
     //   );
     // }
 
-    const budget = await this.databaseService.budget.findFirst({
+    const budget = await this.databaseService.client.budget.findFirst({
       where: {
         id,
         ownerId: operatorId,
@@ -388,7 +385,7 @@ export class BudgetService {
     }
 
     if (budget.members.length !== 0) {
-      await this.databaseService.budgetMember.deleteMany({
+      await this.databaseService.client.budgetMember.deleteMany({
         where: {
           budgetId: id,
           user: {
@@ -398,7 +395,7 @@ export class BudgetService {
       });
     }
 
-    return this.databaseService.budgetAdmin.deleteMany({
+    return this.databaseService.client.budgetAdmin.deleteMany({
       where: {
         budgetId: id,
         user: {
@@ -409,14 +406,14 @@ export class BudgetService {
   }
 
   async isBudgetOwner(budgetId: string, userId: string) {
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: { id: budgetId },
     });
     return budget.ownerId === userId;
   }
 
   async getExpenditureByUser(id: string, pagination: Pagination) {
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: { id },
       include: {
         currency: true,
@@ -427,7 +424,7 @@ export class BudgetService {
       throw new BadRequestException("Budget not found");
     }
 
-    const expenditures = await this.databaseService.user.findMany({
+    const expenditures = await this.databaseService.client.user.findMany({
       where: {
         OR: [
           { memberBudgets: { some: { budgetId: id } } },
@@ -467,10 +464,10 @@ export class BudgetService {
           (sum, t) => sum + t.amount,
           0,
         ),
-      }
+      },
     }));
 
-    const totalCount = await this.databaseService.user.count({
+    const totalCount = await this.databaseService.client.user.count({
       where: {
         OR: [
           { memberBudgets: { some: { budgetId: id } } },
@@ -479,7 +476,7 @@ export class BudgetService {
       },
     });
 
-    const allTransactions = await this.databaseService.transaction.findMany({
+    const allTransactions = await this.databaseService.client.transaction.findMany({
       where: {
         status: { in: ["APPROVED", "VALIDATED"] },
         budgetId: id,
@@ -493,7 +490,7 @@ export class BudgetService {
     const avgUserExpenditure = totalCount > 0 ? totalAmount / totalCount : 0;
 
     const sortedExpenditures = processedExpenditures.sort((a, b) =>
-      b.totalTransactions.amount - a.totalTransactions.amount,
+      b.totalTransactions.amount - a.totalTransactions.amount
     );
 
     return {
@@ -577,7 +574,7 @@ export class BudgetService {
 
     if (filters_or.length === 0 && filters_and.length === 0) return [];
 
-    const budgets = await this.databaseService.budget.findMany({
+    const budgets = await this.databaseService.client.budget.findMany({
       where: {
         OR: filters_or,
         ...filters_and,
@@ -608,7 +605,7 @@ export class BudgetService {
       take: pagination?.limit,
     });
 
-    const count = await this.databaseService.budget.count({
+    const count = await this.databaseService.client.budget.count({
       where: {
         OR: filters_or,
         ...filters_and,
@@ -636,7 +633,7 @@ export class BudgetService {
   }
 
   async getBudgetMembers(id: string) {
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: {
         id,
       },
@@ -646,7 +643,7 @@ export class BudgetService {
       throw new BadRequestException("Budget not found");
     }
 
-    return this.databaseService.budget.findUnique({
+    return this.databaseService.client.budget.findUnique({
       where: {
         id,
       },
@@ -671,7 +668,7 @@ export class BudgetService {
   }
 
   async getBudgetAdmins(id: string) {
-    const budget = await this.databaseService.budget.findUnique({
+    const budget = await this.databaseService.client.budget.findUnique({
       where: {
         id,
       },
@@ -681,7 +678,7 @@ export class BudgetService {
       throw new BadRequestException("Budget not found");
     }
 
-    return this.databaseService.budget.findUnique({
+    return this.databaseService.client.budget.findUnique({
       where: {
         id,
       },
